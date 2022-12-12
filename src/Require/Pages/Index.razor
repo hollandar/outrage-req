@@ -1,4 +1,7 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+@using System.Security.Claims;
+@inject IAccessTokenProvider AccessTokenProvider
 
 <PageTitle>Index</PageTitle>
 
@@ -7,3 +10,39 @@
 Welcome to your new app.
 
 <SurveyPrompt Title="How is Blazor working for you?" />
+
+<AuthorizeView>
+    <Authorized>
+        @(AccessToken)
+
+        @foreach (var claim in Claims)
+        {
+            <div>@claim.Type: @claim.Value</div>
+        }
+    </Authorized>
+</AuthorizeView>
+
+
+@code {
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthenticationState { get; set; }
+
+    public string AccessToken { get; set; }
+    public IEnumerable<Claim> Claims { get; set; } = Array.Empty<Claim>();
+    protected override async Task OnInitializedAsync()
+    {
+        var token = await AccessTokenProvider.RequestAccessToken();
+        var authenticationState = await AuthenticationState;
+        this.Claims = authenticationState.User.Claims;
+        if (token.TryGetToken(out AccessToken accessToken))
+        {
+            AccessToken = accessToken.Value;
+        }
+        else
+        {
+            AccessToken = string.Empty;
+        }
+
+        await base.OnInitializedAsync();
+    }
+}
