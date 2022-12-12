@@ -1,0 +1,6 @@
+[submodule "modules/patternfly"]
+	path = modules/patternfly
+	url = https://github.com/hollandar/outrage-patternfly
+[submodule "modules/domain"]
+	path = modules/domain
+	url = https://github.com/hollandar/outrage-domain
